@@ -4,7 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using RabbitMQ.Client;
+using System.Text;
+using Newtonsoft.Json;
 using UserService.Data;
+
 
 namespace UserService.Controllers
 {
@@ -31,6 +35,10 @@ namespace UserService.Controllers
         {
             _context.Entry(user).State = EntityState.Modified;
             await _context.SaveChangesAsync();
+
+            var integrationEventData = JsonConvert.SerializeObject(new { id = user.ID, newname = user.Name });
+            PublishToMessageQueue("user.update", integrationEventData);
+
             return NoContent();
         }
 
@@ -43,8 +51,31 @@ namespace UserService.Controllers
                 user.ID = _context.User.Max(x => x.ID) + 1;
             }
             _context.User.Add(user);
-            await _context.SaveChangesAsync();             
+            await _context.SaveChangesAsync();
+
+            var integrationEventData = JsonConvert.SerializeObject(new { id = user.ID, name = user.Name });
+            PublishToMessageQueue("user.add", integrationEventData);
+
             return CreatedAtAction("GetUser", new { id = user.ID }, user);
+        }
+
+
+        private void PublishToMessageQueue(string integrationEvent, string eventData)
+        {
+            var factory = new ConnectionFactory();
+            //var connection = factory.CreateConnection();
+            using (var connection  = factory.CreateConnection())
+            {                
+                using (var channel = connection.CreateModel())
+                {
+                    var body = Encoding.UTF8.GetBytes(eventData);
+                    channel.BasicPublish(exchange: "user",
+                        routingKey: integrationEvent,
+                        mandatory: true,
+                        basicProperties: null,
+                        body: body);
+                }                
+            }                        
         }
             
     }
