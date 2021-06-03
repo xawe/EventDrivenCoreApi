@@ -30,14 +30,15 @@ namespace UserService
         {
 
             services.AddControllers();
+
+            var sqlConnectionString = Configuration.GetConnectionString("PostgreSqlConnectionString");
+            services.AddDbContext<UserService.Data.UserServiceContext>(options => options.UseNpgsql(sqlConnectionString));
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "UserService", Version = "v1" });
             });
-            
-            var sqlConnectionString = Configuration.GetConnectionString("PostgreSqlConnectionString");
-            //services.AddDbContext<UserService.Data.UserServiceContext>(options => )
-            services.AddDbContext<UserService.Data.UserServiceContext>(options => options.UseNpgsql(sqlConnectionString));
+                        
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
