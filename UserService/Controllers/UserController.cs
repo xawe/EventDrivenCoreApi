@@ -43,8 +43,7 @@ namespace UserService.Controllers
                 user.ID = _context.User.Max(x => x.ID) + 1;
             }
             _context.User.Add(user);
-            //await _context.SaveChangesAsync();
-             _context.SaveChanges();
+            await _context.SaveChangesAsync();             
             return CreatedAtAction("GetUser", new { id = user.ID }, user);
         }
             
