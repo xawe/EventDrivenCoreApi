@@ -22,6 +22,7 @@ namespace UserService.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserService.Entities.User>>> GetUser()
         {
+            
             return await _context.User.ToListAsync();
         }
 
@@ -36,8 +37,14 @@ namespace UserService.Controllers
         [HttpPost]
         public async Task<ActionResult<Entities.User>> PostUser(Entities.User user)
         {
+            user.ID = 1;
+            if (_context.User.Any())
+            {
+                user.ID = _context.User.Max(x => x.ID) + 1;
+            }
             _context.User.Add(user);
-            await _context.SaveChangesAsync();
+            //await _context.SaveChangesAsync();
+             _context.SaveChanges();
             return CreatedAtAction("GetUser", new { id = user.ID }, user);
         }
             
