@@ -5,6 +5,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Hangfire;
+using Hangfire.MemoryStorage;
 
 namespace PostService
 {
@@ -25,6 +27,12 @@ namespace PostService
 
             var sqlConnectionString = Configuration.GetConnectionString("PostgreSqlConnectionString");
             services.AddDbContext<PostService.Data.PostServiceContext>(options => options.UseNpgsql(sqlConnectionString));
+            var storage = new MemoryStorage();
+            var options = new BackgroundJobServerOptions { ServerName = "local" };
+            JobStorage.Current = storage;
+            services.AddHangfire(x => x.UseMemoryStorage());
+
+            RecurringJob.AddOrUpdate(() => System.Diagnostics.Debug.WriteLine("Minute XX"), Cron.Minutely);
 
             services.AddSwaggerGen(c =>
             {
@@ -50,6 +58,9 @@ namespace PostService
             {
                 endpoints.MapControllers();
             });
+
+            app.UseHangfireDashboard();
+            app.UseHangfireServer();
         }
     }
 }
