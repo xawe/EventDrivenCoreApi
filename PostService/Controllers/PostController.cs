@@ -1,12 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Mvc;
 using PostService.Data;
 using PostService.Entities;
-using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 
 namespace PostService.Controllers
@@ -16,30 +12,25 @@ namespace PostService.Controllers
     public class PostController : ControllerBase
     {
         private readonly PostService.Data.PostServiceContext _context;
+        private readonly IPostData _postData;
 
-        public PostController(PostServiceContext context)
+        public PostController(PostServiceContext context, IPostData postData)
         {
             _context = context;
+            _postData = postData;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PostService.Entities.Post>>> GetPost()
         {
-            return await _context.Post.Include(x => x.User).ToListAsync();
+            return await _postData.GetAllPosts();
         }
 
         [HttpPost]
         public async Task<ActionResult<Post>> PostPost(Post post)
         {
-            post.PostId = 1;
-            if (_context.Post.Any())
-            {
-                post.PostId = _context.Post.Max(x => x.PostId) + 1;
-            }
-
-            _context.Post.Add(post);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction("GetPost", new { id = post.PostId }, post);
+            var p = await _postData.AddPost(post);            
+            return CreatedAtAction("GetPost", new { id = p.PostId }, p);
         }
         
     }

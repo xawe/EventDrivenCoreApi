@@ -10,7 +10,7 @@ namespace PostService.Message
 {
     public class Listener
     {
-        private static void ListenForIntegrationEvents(string sqlConncetionString)
+        public void ListenForIntegrationEvents(string sqlConncetionString)
         {
             var factory = new ConnectionFactory();
             var connection = factory.CreateConnection();

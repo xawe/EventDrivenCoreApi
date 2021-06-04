@@ -22,17 +22,18 @@ namespace PostService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddControllers();
 
             var sqlConnectionString = Configuration.GetConnectionString("PostgreSqlConnectionString");
             services.AddDbContext<PostService.Data.PostServiceContext>(options => options.UseNpgsql(sqlConnectionString));
+
             var storage = new MemoryStorage();
             var options = new BackgroundJobServerOptions { ServerName = "local" };
             JobStorage.Current = storage;
             services.AddHangfire(x => x.UseMemoryStorage());
 
-            RecurringJob.AddOrUpdate(() => System.Diagnostics.Debug.WriteLine("Minute XX"), Cron.Minutely);
+
+            services.AddScoped<Data.IPostData, Data.PostData>();
 
             services.AddSwaggerGen(c =>
             {
@@ -61,6 +62,13 @@ namespace PostService
 
             app.UseHangfireDashboard();
             app.UseHangfireServer();
+
+            
+            var sqlConnectionString = Configuration.GetConnectionString("PostgreSqlConnectionString");
+
+            //Iniciando o servico responsável por escutar os eventos da fila usando o Hanfire
+            BackgroundJob.Enqueue(() => new PostService.Message.Listener().ListenForIntegrationEvents(sqlConnectionString));
+
         }
     }
 }

@@ -19,8 +19,7 @@ namespace PostService
     {        
         public static void Main(string[] args)
         {
-
-            ListenForIntegrationEvents(GetDatabaseConnectionString(args));
+            //ListenForIntegrationEvents(GetDatabaseConnectionString(args));
             CreateHostBuilder(args).Build().Run();
             
         }
