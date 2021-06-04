@@ -17,6 +17,7 @@
 #Hangfire
 	
 	Usado para gerar serviços em background para escuta das filas
+	Para acessar o painel de serviços, usar http://url/hangfire
 
 
 
