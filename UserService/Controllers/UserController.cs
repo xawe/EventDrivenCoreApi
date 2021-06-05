@@ -1,12 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using RabbitMQ.Client;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using RabbitMQ.Client;
 using System.Text;
-using Newtonsoft.Json;
+using System.Threading.Tasks;
 using UserService.Data;
 
 
@@ -17,28 +15,25 @@ namespace UserService.Controllers
     public class UserController : ControllerBase
     {
         private readonly UserService.Data.UserServiceContext _context;
-
-        public UserController(UserServiceContext context)
+        private readonly UserService.Data.IUserData _userData;
+        public UserController(UserServiceContext context, UserService.Data.IUserData userData)
         {
             _context = context;
+            _userData = userData;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserService.Entities.User>>> GetUser()
         {
-            
-            return await _context.User.ToListAsync();
+            return await _userData.GetAllUsers();                        
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUser(int id, UserService.Entities.User user)
-        {
-            _context.Entry(user).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-
-            var integrationEventData = JsonConvert.SerializeObject(new { id = user.ID, newname = user.Name });
+        {            
+            var r = await _userData.UpdateUser(user);
+            var integrationEventData = JsonConvert.SerializeObject(new { id = r.ID, newname = r.Name });
             PublishToMessageQueue("user.update", integrationEventData);
-
             return NoContent();
         }
 
@@ -47,20 +42,11 @@ namespace UserService.Controllers
         {
             try
             {
-                
-                user.ID = 1;
-                if (_context.User.Any())
-                {
-                    user.ID = _context.User.Max(x => x.ID) + 1;
-                }
-                Console.WriteLine("Criando usuário ID " + user.ID);
-                _context.User.Add(user);
-                await _context.SaveChangesAsync();
-
-                var integrationEventData = JsonConvert.SerializeObject(new { id = user.ID, name = user.Name });
+                var r = await _userData.AddUser(user);
+                var integrationEventData = JsonConvert.SerializeObject(new { id = r.ID, name = r.Name });
                 PublishToMessageQueue("user.add", integrationEventData);
 
-                return CreatedAtAction("GetUser", new { id = user.ID }, user);
+                return CreatedAtAction("GetUser", new { id = r.ID }, r);
             }
             catch (Exception ex)
             {

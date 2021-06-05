@@ -34,6 +34,8 @@ namespace PostService
 
 
             services.AddScoped<Data.IPostData, Data.PostData>();
+            services.AddScoped<Data.IUserData, Data.UserData>();
+            services.AddScoped<Message.IListener, Message.Listener>();
 
             services.AddSwaggerGen(c =>
             {
@@ -42,7 +44,7 @@ namespace PostService
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, Message.IListener listener)
         {
             if (env.IsDevelopment())
             {
@@ -62,12 +64,10 @@ namespace PostService
 
             app.UseHangfireDashboard();
             app.UseHangfireServer();
-
             
-            var sqlConnectionString = Configuration.GetConnectionString("PostgreSqlConnectionString");
-
+            var sqlConnectionString = Configuration.GetConnectionString("PostgreSqlConnectionString");            
             //Iniciando o servico responsável por escutar os eventos da fila usando o Hanfire
-            BackgroundJob.Enqueue(() => new PostService.Message.Listener().ListenForIntegrationEvents(sqlConnectionString));
+            BackgroundJob.Enqueue(() => listener.ListenForIntegrationEvents(sqlConnectionString));
 
         }
     }
