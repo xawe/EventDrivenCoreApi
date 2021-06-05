@@ -5,11 +5,17 @@ using RabbitMQ.Client.Events;
 using System;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace PostService.Message
 {
-    public class Listener
+    public class Listener : IListener
     {
+        private readonly Data.IUserData _userData;
+        public Listener(Data.IUserData userData)
+        {
+            _userData = userData;
+        }
         public void ListenForIntegrationEvents(string sqlConncetionString)
         {
             var factory = new ConnectionFactory();
@@ -17,13 +23,11 @@ namespace PostService.Message
             {
                 var channel = connection.CreateModel();
                 var consumer = new EventingBasicConsumer(channel);
+                
                 consumer.Received += (model, e) =>
                 {
-                    var contextOptions = new DbContextOptionsBuilder<PostServiceContext>()
-                        .UseNpgsql(sqlConncetionString)
-                        .Options;
-                    var dbContext = new PostServiceContext(contextOptions);
-
+                    var dbContext = this.BuildContext(sqlConncetionString);
+                    _userData.dbContext = dbContext;
                     var body = e.Body.ToArray();
                     var message = System.Text.Encoding.UTF8.GetString(body);
                     Console.WriteLine("[x] Received {0}", message);
@@ -31,25 +35,44 @@ namespace PostService.Message
                     var type = e.RoutingKey;
                     if (type == "user.add")
                     {
-                        dbContext.Users.Add(new User()
-                        {
-                            ID = data.Value<int>("id"),
-                            Name = data.Value<string>("name")
-                        });
-                        dbContext.SaveChanges();
+                        _userData.AddUser(BuildUser(data));
                     }
                     else if (type == "user.update")
                     {
-                        var user = dbContext.Users.First(a => a.ID == data.Value<int>("id"));
-                        user.Name = data.Value<string>("newname");
-                        dbContext.SaveChanges();
+                        _userData.UpdateUser(this.BuildUser(data, true));                        
                     }
+                    _userData.dbContext.Dispose();
                 };
 
                 channel.BasicConsume(queue: "user.postservice",
                         autoAck: true,
                         consumer: consumer);
             }
+        }
+
+        private User BuildUser(Newtonsoft.Json.Linq.JObject data, bool isUpdate = false)
+        {
+            var user = new User();
+            user.ID = data.Value<int>("id");
+            if (isUpdate)
+            {
+                user.Name = data.Value<string>("newname");
+            }
+            else
+            {
+                user.Name = data.Value<string>("name");
+            }
+
+            return user;
+        }
+
+        private PostServiceContext BuildContext(string sqlConncetionString)
+        {
+            var contextOptions = new DbContextOptionsBuilder<PostServiceContext>()
+                        .UseNpgsql(sqlConncetionString)
+                        .Options;
+            var dbContext = new PostServiceContext(contextOptions);
+            return dbContext;
         }
     }
 }

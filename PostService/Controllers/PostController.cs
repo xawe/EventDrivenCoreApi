@@ -10,13 +10,11 @@ namespace PostService.Controllers
     [Route("api/[controller]")]
     [ApiController]
     public class PostController : ControllerBase
-    {
-        private readonly PostService.Data.PostServiceContext _context;
+    {        
         private readonly IPostData _postData;
 
-        public PostController(PostServiceContext context, IPostData postData)
-        {
-            _context = context;
+        public PostController( IPostData postData)
+        {            
             _postData = postData;
         }
 
