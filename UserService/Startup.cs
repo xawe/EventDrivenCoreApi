@@ -26,6 +26,8 @@ namespace UserService
             var sqlConnectionString = Configuration.GetConnectionString("PostgreSqlConnectionString");
             services.AddDbContext<UserService.Data.UserServiceContext>(options => options.UseNpgsql(sqlConnectionString));
 
+            services.AddScoped<Data.IUserData, Data.UserData>();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "UserService", Version = "v1" });
