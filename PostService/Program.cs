@@ -35,10 +35,20 @@ namespace PostService
             providers[0].TryGet("ConnectionStrings:PostgreSqlConnectionString", out connString);
             return connString;
 
-        }       
+        }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                // Formatando log como json
+                .ConfigureLogging(builder =>
+                {
+                    builder.AddJsonConsole(options =>
+                    {
+                        options.IncludeScopes = false;
+                        options.TimestampFormat = "hh:mm:ss ";
+                        options.JsonWriterOptions = new System.Text.Json.JsonWriterOptions { Indented = true };
+                    });
+                })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();

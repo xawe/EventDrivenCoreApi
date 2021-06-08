@@ -6,18 +6,23 @@ using System;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace PostService.Message
 {
     public class Listener : IListener
     {
         private readonly Data.IUserData _userData;
-        public Listener(Data.IUserData userData)
+        private readonly ILogger<Listener> _logger;
+
+        public Listener(Data.IUserData userData, ILogger<Listener> logger)
         {
             _userData = userData;
+            _logger = logger;
         }
         public void StartListener(string sqlConncetionString)
         {
+            _logger.LogInformation("Iniciando Listener");
             var factory = new ConnectionFactory();
             var connection = factory.CreateConnection();
             {
