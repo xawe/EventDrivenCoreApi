@@ -7,6 +7,6 @@ namespace PostService.Message
 {
     public interface IListener
     {
-        void ListenForIntegrationEvents(string sqlConncetionString);
+        void StartListener(string sqlConncetionString);
     }
 }
