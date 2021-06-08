@@ -22,7 +22,7 @@ namespace PostService.Message
         }
         public void StartListener(string sqlConncetionString)
         {
-            _logger.LogInformation("Iniciando Listener");
+            _logger.LogInformation(LoggingEvents.Create, "Iniciando Listener");
             var factory = new ConnectionFactory();
             var connection = factory.CreateConnection();
             {
