@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using UserService.Data;
+using Service.Common.Messages;
 
 
 namespace UserService.Controllers
@@ -33,7 +34,7 @@ namespace UserService.Controllers
         {            
             var r = await _userData.UpdateUser(user);
             var integrationEventData = JsonConvert.SerializeObject(new { id = r.ID, newname = r.Name });
-            PublishToMessageQueue("user.update", integrationEventData);
+            PublishToMessageQueue(QueueName.UserUpdate, integrationEventData);
             return NoContent();
         }
 
@@ -44,7 +45,7 @@ namespace UserService.Controllers
             {
                 var r = await _userData.AddUser(user);
                 var integrationEventData = JsonConvert.SerializeObject(new { id = r.ID, name = r.Name });
-                PublishToMessageQueue("user.add", integrationEventData);
+                PublishToMessageQueue(QueueName.UserAdd, integrationEventData);;
 
                 return CreatedAtAction("GetUser", new { id = r.ID }, r);
             }

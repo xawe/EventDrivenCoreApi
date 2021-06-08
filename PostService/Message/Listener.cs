@@ -7,6 +7,7 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Service.Common.Messages;
 
 namespace PostService.Message
 {
@@ -48,11 +49,11 @@ namespace PostService.Message
                 Console.WriteLine("[x] Received {0}", message);
                 var data = Newtonsoft.Json.Linq.JObject.Parse(message);
                 var type = e.RoutingKey;
-                if (type == "user.add")
+                if (type == QueueName.UserAdd)
                 {
                     _userData.AddUser(BuildUser(data));
                 }
-                else if (type == "user.update")
+                else if (type == QueueName.UserUpdate)
                 {
                     _userData.UpdateUser(this.BuildUser(data, true));
                 }
