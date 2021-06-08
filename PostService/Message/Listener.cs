@@ -16,38 +16,43 @@ namespace PostService.Message
         {
             _userData = userData;
         }
-        public void ListenForIntegrationEvents(string sqlConncetionString)
+        public void StartListener(string sqlConncetionString)
         {
             var factory = new ConnectionFactory();
             var connection = factory.CreateConnection();
             {
                 var channel = connection.CreateModel();
                 var consumer = new EventingBasicConsumer(channel);
-                
-                consumer.Received += (model, e) =>
-                {
-                    var dbContext = this.BuildContext(sqlConncetionString);
-                    _userData.dbContext = dbContext;
-                    var body = e.Body.ToArray();
-                    var message = System.Text.Encoding.UTF8.GetString(body);
-                    Console.WriteLine("[x] Received {0}", message);
-                    var data = Newtonsoft.Json.Linq.JObject.Parse(message);
-                    var type = e.RoutingKey;
-                    if (type == "user.add")
-                    {
-                        _userData.AddUser(BuildUser(data));
-                    }
-                    else if (type == "user.update")
-                    {
-                        _userData.UpdateUser(this.BuildUser(data, true));                        
-                    }
-                    _userData.dbContext.Dispose();
-                };
+
+                ListenMessageEvents(sqlConncetionString, consumer);
 
                 channel.BasicConsume(queue: "user.postservice",
                         autoAck: true,
                         consumer: consumer);
             }
+        }
+
+        private void ListenMessageEvents(string sqlConncetionString, EventingBasicConsumer consumer)
+        {
+            consumer.Received += (model, e) =>
+            {
+                var dbContext = this.BuildContext(sqlConncetionString);
+                _userData.dbContext = dbContext;
+                var body = e.Body.ToArray();
+                var message = System.Text.Encoding.UTF8.GetString(body);
+                Console.WriteLine("[x] Received {0}", message);
+                var data = Newtonsoft.Json.Linq.JObject.Parse(message);
+                var type = e.RoutingKey;
+                if (type == "user.add")
+                {
+                    _userData.AddUser(BuildUser(data));
+                }
+                else if (type == "user.update")
+                {
+                    _userData.UpdateUser(this.BuildUser(data, true));
+                }
+                _userData.dbContext.Dispose();
+            };
         }
 
         private User BuildUser(Newtonsoft.Json.Linq.JObject data, bool isUpdate = false)

@@ -67,7 +67,7 @@ namespace PostService
             
             var sqlConnectionString = Configuration.GetConnectionString("PostgreSqlConnectionString");            
             //Iniciando o servico responsável por escutar os eventos da fila usando o Hanfire
-            BackgroundJob.Enqueue(() => listener.ListenForIntegrationEvents(sqlConnectionString));
+            BackgroundJob.Enqueue(() => listener.StartListener(sqlConnectionString));
 
         }
     }
