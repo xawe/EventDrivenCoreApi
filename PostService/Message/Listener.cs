@@ -6,18 +6,24 @@ using System;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Service.Common.Messages;
 
 namespace PostService.Message
 {
     public class Listener : IListener
     {
         private readonly Data.IUserData _userData;
-        public Listener(Data.IUserData userData)
+        private readonly ILogger<Listener> _logger;
+
+        public Listener(Data.IUserData userData, ILogger<Listener> logger)
         {
             _userData = userData;
+            _logger = logger;
         }
         public void StartListener(string sqlConncetionString)
         {
+            _logger.LogInformation(LoggingEvents.Create, "Iniciando Listener");
             var factory = new ConnectionFactory();
             var connection = factory.CreateConnection();
             {
@@ -43,11 +49,11 @@ namespace PostService.Message
                 Console.WriteLine("[x] Received {0}", message);
                 var data = Newtonsoft.Json.Linq.JObject.Parse(message);
                 var type = e.RoutingKey;
-                if (type == "user.add")
+                if (type == QueueName.UserAdd)
                 {
                     _userData.AddUser(BuildUser(data));
                 }
-                else if (type == "user.update")
+                else if (type == QueueName.UserUpdate)
                 {
                     _userData.UpdateUser(this.BuildUser(data, true));
                 }

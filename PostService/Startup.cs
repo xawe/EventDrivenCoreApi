@@ -23,6 +23,7 @@ namespace PostService
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            
 
             var sqlConnectionString = Configuration.GetConnectionString("PostgreSqlConnectionString");
             services.AddDbContext<PostService.Data.PostServiceContext>(options => options.UseNpgsql(sqlConnectionString));
