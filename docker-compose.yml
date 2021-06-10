@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  postgresql-evend-driven:
+    image: 'postgres:alpine'
+    ports:
+      - '5432:5432'
+    volumes:
+      - /database/postgresql/data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: "postgres"
+      PGDATA: /var/lib/postgresql/data/report
+
+    networks:
+      - event-driven-network
+
+  pgadmin-code-brother:
+    image: 'dpage/pgadmin4'
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "xawe@api.com.br"
+      PGADMIN_DEFAULT_PASSWORD: "postgres"
+    ports:
+      - "16543:80"
+    depends_on:
+      - postgresql-evend-driven
+    networks:
+      - event-driven-network
+
+networks: 
+  event-driven-network:
+    driver: bridge
+
+volumes:
+  postgresql_data:
+    driver: local  
