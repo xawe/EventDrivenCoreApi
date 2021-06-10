@@ -16,17 +16,17 @@
 
 ### Docker compose
 
-	Executar o comando *docker-compose up* irá subir os containeres abaixo:
+	Executar o comando **docker-compose up** irá subir os containeres abaixo:
 
 	# Postgresql
 	
-		- usar as credenciais *postgres/postgres*
-		- nome do container -> *postgresql-01*
+		- usar as credenciais **postgres/postgres**
+		- nome do container -> **postgresql-01**
 
 	# Pgadmin - opcional - Para usar o pgadmin para administrar o banco postgresql:
 
-		- usar as credenciais *test@api.com/postgres*
-		- adicionar um novo server pelo usando o hostname do container do postgresql *postgresql-01*
+		- usar as credenciais **test@api.com/postgres**
+		- adicionar um novo server pelo usando o hostname do container do postgresql **postgresql-01**
 		- usar as credencias do postgresql descritas acima
 
 
@@ -53,4 +53,4 @@ Possui um listener que recebe informações de cada usuário criado/atualizado no s
 
 Para cada um dos projetos, executar o comando abaixo para criação do banco de dados e tabelas
 
-- * dotnet ef database update *
+- **dotnet ef database update**
