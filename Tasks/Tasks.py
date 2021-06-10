@@ -1,5 +1,10 @@
+from Database.Migrations import *
 
-from Database import Migrations
+print("############### Iniciando Migrations ###############")
+projetos = ["PostService", "UserService"]
+for projeto in projetos:
+    print("Executando migration para o projeto >> " + projeto)
+    Migrations.executeMigration(projeto)
+    pass
 
-
-Migrations.hello()
+print("############### Finalizando Migrations ###############")
