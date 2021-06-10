@@ -16,7 +16,7 @@ services:
   pgadmin:
     image: 'dpage/pgadmin4'
     environment:
-      PGADMIN_DEFAULT_EMAIL: "xawe@api.com.br"
+      PGADMIN_DEFAULT_EMAIL: "test@api.com"
       PGADMIN_DEFAULT_PASSWORD: "postgres"
     ports:
       - "16543:80"
