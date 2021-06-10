@@ -18,12 +18,12 @@
 
 	Executar o comando **docker-compose up** irá subir os containeres abaixo:
 
-	# Postgresql
+	- Postgresql
 	
 		- usar as credenciais **postgres/postgres**
 		- nome do container -> **postgresql-01**
 
-	# Pgadmin - opcional - Para usar o pgadmin para administrar o banco postgresql:
+	- Pgadmin - opcional - Para usar o pgadmin para administrar o banco postgresql:
 
 		- usar as credenciais **test@api.com/postgres**
 		- adicionar um novo server pelo usando o hostname do container do postgresql **postgresql-01**
