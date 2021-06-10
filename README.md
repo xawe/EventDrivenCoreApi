@@ -20,13 +20,13 @@
 
 	# Postgresql
 	
-		- usar as credenciais * postgres/postgres *
-		- nome do container -> * postgresql-01 *
+		- usar as credenciais *postgres/postgres*
+		- nome do container -> *postgresql-01*
 
 	# Pgadmin - opcional - Para usar o pgadmin para administrar o banco postgresql:
 
-		- usar as credenciais * test@api.com/postgres *
-		- adicionar um novo server pelo usando o hostname do container do postgresql * postgresql-01 *
+		- usar as credenciais *test@api.com/postgres*
+		- adicionar um novo server pelo usando o hostname do container do postgresql *postgresql-01*
 		- usar as credencias do postgresql descritas acima
 
 
