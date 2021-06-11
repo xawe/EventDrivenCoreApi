@@ -4,7 +4,8 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>a8f1b602-9c6c-4860-840d-c4e0593ceafa</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>Tasks.py</StartupFile>
+    <StartupFile>
+    </StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -21,7 +22,17 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Tasks.py" />
+    <Compile Include="Database\Migrations.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Database\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ExecuteMigrations.py" />
+    <Compile Include="__init__.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Database\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

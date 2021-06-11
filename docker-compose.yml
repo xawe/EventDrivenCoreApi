@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  postgresql-01:
+  postgresql-db:
     image: 'postgres:alpine'
     ports:
       - '5432:5432'
@@ -21,7 +21,19 @@ services:
     ports:
       - "16543:80"
     depends_on:
-      - postgresql-01
+      - postgresql-db
+    networks:
+      - event-network
+
+  rabbitmq-broker:
+    image: "rabbitmq:3-management"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - 'rabbitmq_data:/data'
+    depends_on:
+      - postgresql-db
     networks:
       - event-network
 
@@ -32,3 +44,5 @@ networks:
 volumes:
   postgresql_data:
     driver: local  
+  rabbitmq_data:
+    driver: local
